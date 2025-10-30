@@ -1,0 +1,13 @@
+[package]
+name = "Hachimi-URA-Plugin"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+hachimi_plugin_sdk = { git = "https://github.com/Hachimi-Hachimi/hachimi_plugin_sdk_rs.git", features = ["il2cpp"] }
+once_cell = "1.19"
+ureq = { version = "2.10", features = ["json"] }
+log = "0.4"
