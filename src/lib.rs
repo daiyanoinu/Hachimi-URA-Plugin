@@ -1,11 +1,17 @@
+extern crate alloc;
+extern crate core;
+
 pub mod Gallop_HttpHelper;
+#[cfg(target_os = "windows")]
+mod windows;
+#[cfg(target_os = "android")]
+mod android;
 
-use hachimi_plugin_sdk::{api::{Hachimi,HachimiApi}, sys::InitResult};
-use hachimi_plugin_sdk::{hachimi_plugin};
+use core::option::Option;
+use core::option::Option::None;
+use hachimi_plugin_sdk::{api::{Hachimi, HachimiApi}, sys::InitResult};
+use hachimi_plugin_sdk::hachimi_plugin;
 use log::info;
-
-static mut API: Option<HachimiApi> = None;
-static mut HACHIMI: Option<Hachimi> = None;
 
 #[hachimi_plugin]
 pub fn main(api: HachimiApi) -> InitResult {

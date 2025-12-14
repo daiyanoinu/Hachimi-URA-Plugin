@@ -1,7 +1,8 @@
-use hachimi_plugin_sdk::api::{Hachimi, HachimiApi};
-use crate::API;
+use hachimi_plugin_sdk::api::HachimiApi;
 
+#[allow(non_snake_case)]
 pub mod Gallop_HttpHelper;
+pub mod ura;
 
 pub fn init(api: HachimiApi) {
     let il2cpp=api.il2cpp();
