@@ -22,13 +22,15 @@ pub struct Config{
     pub notifier_host: String,
     #[serde(default = "Config::default_notifier_timeout_ms")]
     pub notifier_timeout_ms: u64,
+    #[serde(default = "Config::default_notifier_enable")]
+    pub enable: bool,
 }
 
 static CONFIG:Lazy<ArcSwap<Config>>=Lazy::new(||{
     ArcSwap::new(Arc::new(load_config()))
 });
 
-pub fn config()->Arc<Config>{
+pub fn get_config() ->Arc<Config>{
     CONFIG.load_full()
 }
 
@@ -62,9 +64,25 @@ fn load_config()-> Config{
     }
     Config::default()
 }
+pub fn save_config(new_config: &Config) {
+    CONFIG.store(Arc::new(new_config.clone()));
+    // 2. 写入文件持久化
+    if let Some(data_dir) = DATA_DIR.as_ref() {
+        let config_path = data_dir.as_path().join("config.json");
+        match serde_json::to_string_pretty(&new_config) {
+            Ok(json) => {
+                if let Err(e) = std::fs::write(config_path, json) {
+                    error!("写入配置文件失败: {}", e);
+                }
+            }
+            Err(e) => error!("配置序列化失败: {}", e),
+        }
+    }
+}
 impl Config {
     fn default_notifier_host() -> String { "http://127.0.0.1:4693".to_owned() }
     fn default_notifier_timeout_ms() -> u64 { 100 }
+    fn default_notifier_enable() -> bool { true }
 }
 
 impl Default for Config {

@@ -1,22 +1,26 @@
 extern crate alloc;
 extern crate core;
 
+use crate::plugin_api::{InitResult, Vtable};
+
 pub mod Gallop_HttpHelper;
 #[cfg(target_os = "windows")]
 mod windows;
 #[cfg(target_os = "android")]
 mod android;
 
-use core::option::Option;
-use core::option::Option::None;
-use hachimi_plugin_sdk::{api::{Hachimi, HachimiApi}, sys::InitResult};
-use hachimi_plugin_sdk::hachimi_plugin;
-use log::info;
+mod il2cpp;
+pub mod plugin_api;
 
-#[hachimi_plugin]
-pub fn main(api: HachimiApi) -> InitResult {
-    _ = hachimi_plugin_sdk::log::init(api, log::Level::Info);
-    Gallop_HttpHelper::init(api);
-    info!("插件加载完成");
+pub static mut VTABLE: Option<&'static Vtable> = None;
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn hachimi_init(vtable: *mut Vtable, version: i32) -> InitResult {
+    if vtable.is_null() {
+        return InitResult::Ok
+    }
+    VTABLE=Some(&*vtable);
+    il2cpp::helper::init(VTABLE.unwrap());
+    Gallop_HttpHelper::init();
     InitResult::Ok
 }

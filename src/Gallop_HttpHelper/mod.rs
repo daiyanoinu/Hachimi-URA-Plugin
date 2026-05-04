@@ -1,11 +1,11 @@
-use hachimi_plugin_sdk::api::HachimiApi;
+use crate::plugin_api::Vtable;
 
 #[allow(non_snake_case)]
 pub mod Gallop_HttpHelper;
 pub mod ura;
+mod helper;
+mod gui;
 
-pub fn init(api: HachimiApi) {
-    let il2cpp=api.il2cpp();
-    let image=il2cpp.get_assembly_image(c"umamusume.dll");
-    Gallop_HttpHelper::init(api,image);
+pub unsafe fn init() {
+    Gallop_HttpHelper::init();
 }
