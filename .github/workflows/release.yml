@@ -7,32 +7,30 @@ permissions:
   contents: write
 
 jobs:
-  # build-android:
-  #   runs-on: ubuntu-latest
-  #   if: "!contains(github.event.head_commit.message, '[ci skip]')"
-  #   steps:
-  #     - uses: actions/checkout@v5
-  #     - name: Cache Rust dependencies
-  #       uses: swatinem/rust-cache@v2
+  build-android:
+    runs-on: windows-latest
+    if: "!contains(github.event.head_commit.message, '[ci skip]')"
+    steps:
+      - uses: actions/checkout@v5
+      - name: Cache Rust dependencies
+        uses: swatinem/rust-cache@v2
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: |
+            aarch64-linux-android
+      - name: Build for Android
+        env:
+          RELEASE: 1
+        run: ./android_build.ps1
 
-  #     - name: Grant execute permission to build script
-  #       run: chmod +x tools/android/build.sh
-  #     - uses: dtolnay/rust-toolchain@stable
-  #       with:
-  #         toolchain: stable
-  #         targets: |
-  #           armv7-linux-androideabi
-  #           aarch64-linux-android
-  #     - name: Build for Android
-  #       run: RELEASE=1 android_build.sh
-
-  #     - name: Upload Android binaries
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: android
-  #         path: |
-  #           build/*.so
-  #           build/sha256.json
+      - name: Upload Android binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: |
+            build/*.so
+            build/*.json
             
   build-windows:
     runs-on: windows-latest
@@ -54,10 +52,10 @@ jobs:
         with:
           name: windows
           path: |
-            build/hachimi_ura_plugin.dll
+            build/*.dll
 
   create-release:
-    needs: [build-windows]
+    needs: [build-windows,build-android]
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, '[ci skip]')"
     steps:
@@ -109,5 +107,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            artifacts/*
+            artifacts/**/*.so
+            artifacts/**/*.json
+            artifacts/**/*.dll
           tag_name: ${{ env.RELEASE_VERSION }}

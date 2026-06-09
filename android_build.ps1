@@ -42,16 +42,16 @@ if (-not (Test-Path build)) { mkdir build | Out-Null }
 # Cargo build
 cargo build --target=aarch64-linux-android --target-dir=build $CARGOARGS
 
-# # Copy .so
-# Copy-Item "build\aarch64-linux-android\$BUILD_TYPE\libhachimi.so" "build\libmain-arm64-v8a.so" -Force
-#
-# # SHA1 for release
-# if ($env:RELEASE -eq "1") {
-#     $ARM64_V8A_SHA1 = (Get-FileHash -Algorithm SHA1 "build\libmain-arm64-v8a.so").Hash.ToLower()
-#
-# @"
-# {
-#     "libmain-arm64-v8a.so": "$ARM64_V8A_SHA1"
-# }
-# "@ | Out-File -Encoding utf8 "build\sha1.json"
-# }
+# Copy .so
+Copy-Item "build\aarch64-linux-android\$BUILD_TYPE\libhachimi_ura_plugin.so" "build\libhachimi_ura_plugin.so" -Force
+
+# SHA1 for release
+if ($env:RELEASE -eq "1") {
+    $ARM64_V8A_SHA1 = (Get-FileHash -Algorithm SHA1 "build\libhachimi_ura_plugin.so").Hash.ToLower()
+
+@"
+{
+    "libhachimi_ura_plugin.so": "$ARM64_V8A_SHA1"
+}
+"@ | Out-File -Encoding utf8 "build\android-sha1.json"
+}

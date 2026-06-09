@@ -1,5 +1,5 @@
 [package]
-name = "hachimi_ura_plugin"
+name = "hachimi-ura-plugin"
 version = "0.1.0"
 edition = "2024"
 
